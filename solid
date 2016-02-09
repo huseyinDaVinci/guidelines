@@ -59,7 +59,7 @@ public class Main{
     }
 }
 
-L: Robber Duck is a Dock (yes it is )  but you should think that  Robber Duck is substitutable for Dock. (no it is so re-design my advice :)))
+L: Rubber Duck is a Duck (yes it is )  but you should think that  Rubber Duck is substitutable for Duck. (no it is so re-design my advice :)))
 
 it is tricky for finding liskov principle violation however,  just ask this question  "is substitutable for"   lets look at an example..
 
