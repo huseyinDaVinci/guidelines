@@ -1,0 +1,196 @@
+S ingle Responsibility  Principle
+
+O pen/Closed Principle
+
+L iskov Substitutiton  Principle
+
+I nterface Segratition Principle
+
+D ependency Inversion
+
+
+Cohesion (Of course...)
+Strategy Pattern -- Composition over Inheritance
+
+
+S: A class, method should do only one thing no more that. One class should responsible for one thing.  (Çok bıçaklı çakı aklına gelsin)
+
+public Modem:IModem{
+    public connect();
+    public disconnect();
+    public dialUp();
+    public sendMessage(String m);
+}
+
+Instead of this,
+IModemConnection{
+    public void connect(); disconnect();
+}
+
+IModemCommunication(){
+    public void dialUp();  sendMessage(String m);
+}
+
+
+O: Class should be open to change but not to be modified. Core of class should not be changed. In stead of this, you should implements behaviour to class. (Do not fool me twice)
+just remember the rectangle,circle,triangle area calculation example each day new type can be wanted. We should design area calculation by considering this. You do not need for this design for each class and no need extra
+complexity if this class is closed for future requirements. First code normally if a request is wanted then you can transform to this design.
+
+public abstract class Shape{
+        double calcArea();
+}
+
+public class Rectangle : Shape{
+    double calcArea(){
+        //rectangle area..
+    }
+}
+public class Triangle : Shape{
+    double calcArea(){
+        //rectangle area..
+    }
+}
+public class Main{
+    public double sumAreas(Shape[] shapes){
+        double sum;
+        for(Shape shape:shapes){
+                sum+=shape.calcArea();
+        }
+    }
+}
+
+L: Robber Duck is a Dock (yes it is )  but you should think that  Robber Duck is substitutable for Dock. (no it is so re-design my advice :)))
+
+it is tricky for finding liskov principle violation however,  just ask this question  "is substitutable for"   lets look at an example..
+
+class Rectangle{
+
+    int height;
+    int width;
+
+    public Rectangle(int height,int width){
+
+        //.....
+    }
+}
+
+class Square extends Rectangle{
+
+
+    public Square(int height,int width){
+
+        //.....  should be height==width   //not required for Rectangle   so "is not substitutable"   lets create a new base class for these.
+    }
+
+}
+
+class Shape{                                           class Rectangle : Shape                  and                 class Square:Shape
+
+    public void calcArea();
+}
+
+
+I: Long story short is that do not make interface method garbage   if needed, seperate the interfaces
+
+public interface IBird{
+    eat();
+    sleep();
+    fly();
+}
+
+
+class Eagle implements IBird{}                   class Ostrich implements IBird{}  // :(( if we implement this, we will not use fly method and will be useless since Ostrich cannot fly right.
+
+What can we do?  segregate the interfaces like
+
+
+public interface IBird{
+    eat();
+    sleep();
+}
+
+public interface IFlyingBird :IBird {          class Eagle implements IFlyingBird{}                   class Ostrich implements IBird{}
+    fly();
+}
+
+
+D: Higher modules should not be depend on low levels they should depend abstractions      ------------AVOID TIGHT COUPLING--------------
+
+         public class LoggerUploaderManager(){
+
+               uploadLogs(ILogUploader uploader){
+                    uploader.upload();
+               }
+         }
+
+         public interface SftpLogUploader : ILogUploader{                                public class SftpLogUploaderImlp{}                          public class FtpLogUploaderImpl{}
+                upload();
+         }
+
+
+         public interface FtpLogUploader :  ILogUploader{
+                upload();
+         }
+
+
+
+Tightly coupled classes cannot work independently from each other.
+
+
+                     ABSTRACTION LAYER (these layers should depend on this layer during the application process)
+                Presentation Layer : responsible for external communication with users or other components of the system.
+                Business Layer: responsible for business logic models,entities, interactors here()
+                Data Layer: communicating with data sources (databases,internet resources )  DAO classes in this part.
+
+
+Lets give one more example
+
+
+class Button{
+
+
+    void push(Lamb lamb){
+
+       lamb.toggle();
+    }
+
+}
+
+
+class Lamb{void toogle();}       class Television{void toogle();}  ...//So????
+
+
+interface IToogleable{ toogle(); }                     class Lamb{void toogle();} implements IToogleable       class Television{void toogle();}  IToogleable
+
+class Button{
+
+    void push(IToogleable client){
+
+           client.toogle();   // much better....
+    }
+}
+
+
+
+LONG STORY SHORT  IS :
+
+-WRITE CODE FOR ONLY TODAY'S REQUIREMENTS NOT FOR FUTURE (YOU CANNOT KNOW WHAT WILL BE HAPPEN TOMORROW.)
+-Always start with the simplest solution and go to complexity (Qualified code can do much more job with readable and simple code.)
+-Do not repeat yourself (Re usability is very imp. Avoid boiler plate code as much as possible)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
