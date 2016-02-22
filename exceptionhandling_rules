@@ -1,0 +1,53 @@
+
+                                                            EXCEPTION HANDLING
+1-Do not lose stacktrace of an exception.
+
+You caught  the exception, OK!  if the layer has very important information to enrich the exception we can add new information without losing stack trace.
+try {
+     int a=5/0;
+} catch (ArithmeticException e) {
+     ArithmeticException ae = new ArithmeticException( "very valuable information here" "+e.getMessage());
+     ae.setStackTrace(e.getStackTrace()); //do not lose stack trace...
+     throw ae;
+}
+
+2-Throw early, catch later!!
+
+It is very clear because when an exception occurs, if we throw it, it will be clear and easy to find starting point of the exception.
+
+So, for example  think that presentation layer - business layer - data layer    --> think the scenario, an exception occurs in data layer while fetching data.
+
+if we just catch it, the upper layers can be affected in a wrong way or informed with wrong information.
+
+    Generally best practise when you encounter such exceptional cases in low layers it is best practise to throw the exception earlier.
+    When you caught.
+       If you handle this exception just handle no problem.
+       If not, why are you catching? (no sense). Just catch enrich and throw or just throws it.. (But throwing it is important)
+
+
+3-Try to handle the exception as much as earlier  (if you cannot handle do not push that.)
+
+    It is a very very bad practise to wrapping all exception instances and runtime exceptions to a specific exception and throw to upper layers.
+
+
+4-Do not catch RuntimeExceptions which shows logical mistakes on the program. However, sometimes can be useful (rarely) to handle purposes
+
+5-Do not use exceptions for flow control neva!!   and empty catch blocks show very bad programming.
+
+6-Do not throws the exception in general very bad practise  public void a() throws Exception
+
+    Why? because: upper layer should check which type exception has.
+    OK. but lots of boiler plate.  (solution can be multiple catch  in java )
+
+
+My General Style to handle exception based on 3 principles:
+
+    1- Throw early - catch later (fail-fast)
+    2- Do not throw top-level exception be specific  and do not leave empty catch blocks
+    3- When exception occurs, first decide, can you handle with this, if you cannot, do not even catch it just throw it.
+       I cannot handle with it but I want to enrich the exception or log it ok just do these but do not forget to throw the exception.
+
+
+
+
+
