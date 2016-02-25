@@ -1,0 +1,59 @@
+Observables are like iterables in java    book:RxJava for Android App Development O'Reilly
+
+LOGIC AND AIM:
+RxJava is a library that allows us to represent  any operation as
+an  asynchronous data stream that can be  created on any
+thread,  declaratively composed, and  consumed by multiple objects on
+any thread.
+
+
+MAIN DIFFERENCE :Observable can provide access access to asynchronous data
+streams while  Iterables provide access to synchronous ones.
+(Simply observables can get and send stream asynchronously  but iterable cannot do that.)
+
+
+Observables ---->  emits data  stream asynchronously   by Observable.OnSubscribe<String>
+
+
+SCHEDULERS
+while observable emitting data stream asynchronously when a subscriber to subscribe it.  So in  call method
+The main thread will be blocked  during the emitting. So WTF ?
+Schedulers comes to play -->
+   Observable<String> books = Observable.create((Observable.OnSubscribe<String>) subscriber -> {
+            List<String> bookList = getBookFromApi();
+            bookList.forEach(book -> subscriber.onNext(book));
+            subscriber.onCompleted();
+   })
+   .subscribeOn(Schedulers.io())     //we are saying that  emitting part I mean "Call method"  is handled on a IO thread.
+   .observeOn(Schedulers.newThread());   //here we are saying that any emitted result will be observed on a new thread.
+    books.subscribe(System.out::println);  //lastly each book will be captured in this case, in a new thread.
+If any scheduler is not specified these operations will be done in current thread if any blocking operations is made the current thread will be blocked.
+
+OPERATORS
+"Declaratively Composed."  lets understand the meaning first.
+Composing Observable  means that creating complex observables by using small observables
+   Ex:  double calculateGenerousTip(double bill) {
+                 return takeTwentyPercent(Math.ceil(bill));
+        }
+Did you see that?   small functions create a complex functions :)) Functional style ah..
+Operators with Observables  works the same way like the example above.
+
+.subscribeOn()
+.observeOn()   are actually operators
+
+So, Operators make small Observables to complex Observables (map,flatmap,zip etc.)
+We are declaring what will come and go and just compose like takeTwentyPercent(Math.ceil(bill)).
+
+
+SUBSCRIPTION
+Any call Obsrvable.subscribe()  --> will return a subscription ( think as  a channel between observable and observer. the data streams are transmitted through this channel)
+
+
+
+
+
+
+
+
+
+
