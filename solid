@@ -104,7 +104,7 @@ class Eagle implements IBird{}                   class Ostrich implements IBird{
 What can we do?  segregate the interfaces like
 
 
-public interface IBird{
+public interface IBird{   //test
     eat();
     sleep();
 }
