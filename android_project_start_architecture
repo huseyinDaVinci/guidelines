@@ -1,0 +1,41 @@
+
+@inspired  and utilized from Fernando Cejas  https://github.com/android10/Android-CleanArchitecture
+
+PRESENTATION LAYER    (MVP)   
+
+-------interactors--------
+
+DOMAIN LAYER  ( Regular java objects (business logic here.) )
+
+-------boundaries--------
+DATA LAYER    ( Repository Pattern here. )
+
+
+
+						   
+(Subscribers<T>)             (Observables<T>)               (Observables<T>)
+Views (UI)  | Presenter |  Domain Use Cases | Repository | -> Cloud or Disk
+
+
+
+
+
+							RULES OF MINE          
+- Views (UI) will be dumb as much as possible.
+- Seperation of layers. (decoupling) 
+- Seperations of Tests
+
+  PRESENTATION LAYER  (Espresso Tests (only for Android specific ui tests))
+  DOMAIN LAYER   	  (Unit Tests + Functional Tests -Pure java class)
+  DATA LAYER          (Reggression Tests)
+  
+  
+- Be Solid during the project life cycle.
+
+
+
+
+
+
+
+
