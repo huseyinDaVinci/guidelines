@@ -1,0 +1,65 @@
+Component Dependency vs Submodules   (Which one is suitable when ? where ?)
+
+
+-An application component  (Singleton) with a application module holding app related stuffs like SharedPreferences, Logger, LocationService etc.
+ shortly, requiring a base context to be created (application context)
+
+
+
+                                    Component Dependent
+-UserComponent may be needed where use case operations are made. (Here you can need a context,executor etc. which are defined in the application component)
+
+
+    Ok, to reach these items, we should contact with the application component.
+    If we want this context, AppComponent should explicitly expose this to child modules in the graph if not we'll get a compilation error.
+
+
+    @Singleton // Constraints this component to one-per-application or unscoped bindings.
+    @Component(modules = ApplicationModule.class)
+    public interface ApplicationComponent {
+          void inject(BaseActivity baseActivity);
+
+        //Exposed to sub-graphs.
+        Context context();    //now our components depend on this will reach this.
+    }
+
+
+    @PerActivity    //as you see we can now reach and inject context to our graph
+    @Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
+    public interface ActivityComponent {
+        //Exposed to sub-graphs.
+        Activity activity();
+    }
+
+
+
+
+                                SubModules
+
+-Key difference is that when you hook into parent component it is not necessary for Parent Component to explicitly expose its provided objects
+-all modules which is hooked into will access the application objects.
+
+
+@Singleton
+@Component(modules = {ApplicationModule.class})
+public interface AppComponent {
+    void inject(BaseActivity activity);
+    ProfileComponent plus(ProfileModule ProfileModule);
+
+
+@PerProfile
+@Subcomponent(modules = {ProfileModule.class })
+public interface ProfileComponent{
+    void inject(ProfileFragment profileFragment);
+}
+
+//...
+ProfileComponent profileComponent = appComponent.plus(new ProfileModule());
+
+//...ProfileFragment
+profileComponent.inject(this);
+
+
+
+Lastly, Both of these can be used together no matter. 
+
