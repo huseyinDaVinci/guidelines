@@ -1,0 +1,160 @@
+Dagger 2 is a dependency injection framework.
+
+
+purposes:
+
+-simplify accessing the shared objects like our singleton object like SharedPreferences by using injecting annotation @inject
+
+-creating graphs to determines dependencies for complex dependencies
+
+-reduce the amount of boiler plate code
+
+-testing is easy because we can mock the modules and apply some scenarios
+
+-my favorite is we can determine the life cycles of dependencies(Scoping per Activity per Fragment per Session etc.   very useful.)
+
+
+
+So What?
+
+1-We can centralize our singleton objects in a module which a singleton scope like App Module.
+
+@Component: bridge between @Module and @Inject
+@Module: actual place to provide dependencies while injecting
+@Scope: determining the life cycle of the components
+
+
+@Module
+public class ApplicationModule {   // this is application component's module
+
+    private final TestApplication application;
+
+    public ApplicationModule(Application application) {
+        this.application = (TestApplication) application;
+    }
+
+
+    @Singleton
+    @Provides
+    TestApplication provideApplication() {
+        return application;
+    }
+
+    @Singleton
+    @Provides
+    Context provideContext() {
+        return application.getApplicationContext();
+    }
+
+
+    @Singleton
+    @Provides
+    SharedPreferences provideSharedPreferences(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    @Singleton
+    @Provides
+    Navigator providerNavigator() {
+        return new Navigator();
+    }
+
+}
+
+
+****The logic is actually very simple and efficient:
+Create your containers with their scopes and create the modules where containers searches the instances of object while injecting.
+
+2- We created our component, modules ,scopes etc. Ok. Dagger works in a way that it will accept some places to be injected to graph and then
+the place where injection happens should inject itself to the graph to use singletons in the graph.
+
+@Singleton  // per one application
+@Component(modules = {ApplicationModule.class})
+public interface ApplicationComponent {
+    void inject(BaseActivity baseActivity);
+    void inject(ThirdActivity activity);}    //this singletons can be used at these places when they are injected.
+
+
+ private ApplicationComponent applicaitonComponent;     //In application class we are providing our component
+
+ applicaitonComponent = DaggerApplicationComponent.builder()
+         .applicationModule(new ApplicationModule(this))
+         .build();
+
+
+ public abstract class BaseActivity extends AppCompatActivity {
+     @Inject
+     Navigator navigator;
+
+     @Override
+     protected void onCreate(@Nullable Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         ((TestApplication) getApplication()).getApplicationComponent().inject(this);
+     }
+
+
+3- Qualifiers   like   @Named("studentList")    to differentiates the same providers
+@Inject @Named("studentList") List<Person> students;
+
+
+-----we can create our scope annotations and qualifiers ----------------
+
+
+4-Scopes (the most important actually):
+
+            Dagger holds single instance of provided object at the component.
+We can easily understand this by tracking the object memory address for application module when injecting
+There will be only one reference because our application module's scope is singleton per application life cycle.
+
+If provider methods which have not scope will create each instance while each injection.
+
+
+
+5-Component Dependencies
+
+Generally one component one module with Singleton scope will be used, And references of this instances remains memory all time till Application is alive.
+But? We can want somme components with some scope only in memory while user session is active or activity is active etc.
+
+We should create dependent components
+ some rules while creating these dependent components are:
+
+ -Two dependent components cannot have the same scope (Each component needs to define its scope)
+ -Dagger will provide you with scoped/un scoped  instances and rest on you to handle the references of these instances in their scopes.
+ -When creating dependent components, The main component should explicitly expose the object to down stream to be used in sub graphs also.
+
+    @Singleton
+    @Component(modules={AppModule.class})
+    public interface NetComponent {
+        NetworkManager manager();  //we are explicitly expose this instance to be used in sub graphs
+    }
+
+
+
+    @PerActivity // using the previously defined scope, note that @Singleton will not work
+    @Component(dependencies = AppModule.class, modules = ActivityModule.class)
+    public interface ActivityComponent {
+        void inject(MainActivity activity);
+    }
+
+
+    AppComponent appComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+
+    ActivityComponent acitivtyComponent = DaggerActivityComponent.builder()
+                .appComponent(appComponent)
+                .gitHubModule(new ActivityModule())
+                .build();
+
+
+      ..// in MainActivity
+
+      @Inject NetworkManager
+
+     ((MyApp) getApplication()).getGitHubComponent().inject(this);
+
+
+
+
+
+
