@@ -1,0 +1,76 @@
+*Follow the Principle of Least Knowledge   : one class should know only as much as it needs to know. 
+
+class Car {
+
+	private Driver driver;
+	Car(Context context) {
+		this.driver = context.getDriver();
+	} 
+}
+
+should be 
+
+Car(Driver driver) 
+{ this.driver = driver;
+}
+--------------------
+
+*Avoid hidden dependencies and global state 
+public void reserve(){
+	DBManager manager = new DBManager();
+	manager.initDatabase();
+    Reservation r = new Reservation();    // you cannot reserve without db instance
+    r.reserve();
+}
+
+public void reserve(){    //we know anymore Reservation class needs db to reserve.
+	DBManager manager = new DBManager();
+	manager.initDatabase();
+    Reservation r =new Reservation(manager);
+    r.reserve()
+}
+
+---------------------
+
+*Awful impl example here. 
+
+public class DocumentPrinter { 
+	public void printDocument() {
+			switch (document.getDocumentType()) {
+
+				case Documents.WORD_DOCUMENT: 
+				     printWORDDocument(); break;
+				case Documents.PDF_DOCUMENT: 
+				     printPDFDocument(); break;	
+				case Documents.TEXT_DOCUMENT: 
+				     printTextDocument(); break;
+	}
+
+better one like:
+
+
+interface Printer{
+	void printDocument();
+}
+
+class WordPrinter implements Printer{
+	......
+}
+
+class ExcelPrinter implements Printer{
+	......
+}
+
+public class DocumentPrinter{
+	
+	Printer printer;
+
+	public DocumentPrinter(Printer printer){
+		this.printer=printer;
+	}
+	public void printDocument() {
+		printer.printDocument();
+	}
+
+}
+--------------------------------
